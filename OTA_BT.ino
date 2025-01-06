@@ -21,7 +21,7 @@ void setup() {
   Serial.println("ESP32 OTA via Bluetooth iniciado!");
   temp1Bt.defiSP(10000);
  
-  temp2Bt.defiSP(1000);
+  temp2Bt.defiSP(100);
   pinMode(2, OUTPUT);
 }
 
@@ -40,7 +40,7 @@ void loop() {
   if (temp2Bt.Saida(1)) {
     digitalWrite(2, 1 - digitalRead(2));
     temp2Bt.Saida(0);
-    Serial.println(conta++);
+    //Serial.println(conta++);
   }
 
   
@@ -76,7 +76,7 @@ void loop() {
 void handleOTA() {
   static size_t totalBytes = 0;
   static unsigned long lastReceiveTime = millis();
-  const unsigned long timeout = 20000;  // Timeout de 20 segundos sem dados
+  const unsigned long timeout = 10000;  // Timeout de 20 segundos sem dados
 
   if (!Update.isRunning()) {
     Serial.println("Iniciando OTA via Bluetooth...");
@@ -96,6 +96,11 @@ void handleOTA() {
       totalBytes += len;
       lastReceiveTime = millis();
       Serial.printf("Bytes recebidos: %d\n", totalBytes);
+    //   Serial.printf("status Update: %d\n", Update.end(true));
+
+ //if (Update.end(true)) {
+   
+
 
       if (len != 64) {
         Serial.println("Falta de bytes no recebimento");
@@ -103,6 +108,17 @@ void handleOTA() {
 
         SerialBT.printf("Menos de 64 bytes recebidos, vai resetar o ESP32. Total recebidos: %d\n", totalBytes);
 
+ if (Update.end(true)) {
+      Serial.println("OTA concluída com sucesso!");
+      Serial.println("Reiniciando...");
+      SerialBT.println("Ota com Sucesso");
+     
+    } else {
+      Serial.println("Erro ao finalizar OTA!");
+      Serial.printf("Erro: %s\n", Update.errorString());
+      SerialBT.println("Erro ao finalizar OTA!");
+      
+    }
 
         delay(2000);
         ESP.restart();
